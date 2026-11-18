@@ -14,13 +14,21 @@ const int N = 20;
 const int M = 23;
 
 int keys[N] = {20,33,46,59,72,85,98,11,24,37,50,63,76,89,2,15,28,41,54,67};
+int table[M];
 
-int hashFn(int key) {
-    return key % M;
+int hashFn(int key) { return key % M; }
+
+// FIRST ATTEMPT: no collision handling
+void insertKey(int key) {
+    table[hashFn(key)] = key;      // simply overwrite whatever is there
 }
 
 int main() {
-    for (int i = 0; i < N; i++)
-        cout << keys[i] << " -> slot " << hashFn(keys[i]) << endl;
+    for (int i = 0; i < M; i++) table[i] = -1;
+    for (int i = 0; i < N; i++) insertKey(keys[i]);
+
+    int stored = 0;
+    for (int i = 0; i < M; i++) if (table[i] != -1) stored++;
+    cout << "Inserted: " << N << "  Stored: " << stored << endl;
     return 0;
 }
