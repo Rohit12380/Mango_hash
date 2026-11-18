@@ -22,28 +22,36 @@ string names[N] = {"Alphonso","Kesar","Dasheri","Langra","Chausa","Totapuri","Ba
     "Malgova","Rajapuri","Sindhura","Mankurad","Pairi"};
 
 Mango table[M];
+int totalProbes = 0, collisions = 0;
 
 int hashFn(int key) { return key % M; }
 
-int searchKey(int key) {                 // returns slot or -1
+int searchKey(int key) {
     int idx = hashFn(key);
     for (int step = 0; step < M; step++) {
         int pos = (idx + step) % M;
         if (table[pos].key == key) return pos;
-        if (table[pos].key == -1) return -1;     // empty slot => not present
+        if (table[pos].key == -1) return -1;
     }
     return -1;
 }
 
 bool insertKey(int key, string name) {
-    if (searchKey(key) != -1) {          // duplicate check
+    if (searchKey(key) != -1) {
         cout << "Duplicate key " << key << " rejected\n";
         return false;
     }
     int idx = hashFn(key);
     for (int step = 0; step < M; step++) {
         int pos = (idx + step) % M;
-        if (table[pos].key == -1) { table[pos] = {key, name}; return true; }
+        if (table[pos].key == -1) {
+            table[pos] = {key, name};
+            cout << "Insert " << key << " (" << name << "): h = " << idx
+                 << " -> slot " << pos
+                 << (step ? "   [COLLISION, probes = " + to_string(step) + "]" : "") << endl;
+            if (step) { collisions++; totalProbes += step; }
+            return true;
+        }
     }
     return false;
 }
@@ -60,11 +68,14 @@ void display() {
 
 int main() {
     for (int i = 0; i < M; i++) table[i] = {-1, ""};
+    cout << "MANGO VARIETIES HASH TABLE - Division method + Linear probing\n\n";
     for (int i = 0; i < N; i++) insertKey(keys[i], names[i]);
     insertKey(46, "Dasheri");            // duplicate test
     display();
+    cout << "\nCollisions = " << collisions << ", extra probes = " << totalProbes
+         << ", load factor = " << (float)N / M << endl;
     int p = searchKey(89);
-    cout << "\nSearch 89: slot " << p << " (" << table[p].name << ")\n";
+    cout << "Search 89: slot " << p << " (" << table[p].name << ")\n";
     cout << "Search 99: " << (searchKey(99) == -1 ? "not found" : "found") << endl;
     return 0;
 }
