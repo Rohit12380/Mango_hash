@@ -18,17 +18,20 @@ int table[M];
 
 int hashFn(int key) { return key % M; }
 
-// FIRST ATTEMPT: no collision handling
-void insertKey(int key) {
-    table[hashFn(key)] = key;      // simply overwrite whatever is there
+// Linear probing: try h, h+1, h+2, ... wrapping around with % M
+bool insertKey(int key) {
+    int idx = hashFn(key);
+    for (int step = 0; step < M; step++) {
+        int pos = (idx + step) % M;
+        if (table[pos] == -1) { table[pos] = key; return true; }
+    }
+    return false;                  // table full
 }
 
 int main() {
     for (int i = 0; i < M; i++) table[i] = -1;
-    for (int i = 0; i < N; i++) insertKey(keys[i]);
-
     int stored = 0;
-    for (int i = 0; i < M; i++) if (table[i] != -1) stored++;
+    for (int i = 0; i < N; i++) if (insertKey(keys[i])) stored++;
     cout << "Inserted: " << N << "  Stored: " << stored << endl;
     return 0;
 }
