@@ -21,11 +21,25 @@ string names[N] = {"Alphonso","Kesar","Dasheri","Langra","Chausa","Totapuri","Ba
     "Neelam","Mallika","Amrapali","Himsagar","Raspuri","Safeda","Fazli","Badami",
     "Malgova","Rajapuri","Sindhura","Mankurad","Pairi"};
 
-Mango table[M];                    // key == -1 means empty
+Mango table[M];
 
 int hashFn(int key) { return key % M; }
 
+int searchKey(int key) {                 // returns slot or -1
+    int idx = hashFn(key);
+    for (int step = 0; step < M; step++) {
+        int pos = (idx + step) % M;
+        if (table[pos].key == key) return pos;
+        if (table[pos].key == -1) return -1;     // empty slot => not present
+    }
+    return -1;
+}
+
 bool insertKey(int key, string name) {
+    if (searchKey(key) != -1) {          // duplicate check
+        cout << "Duplicate key " << key << " rejected\n";
+        return false;
+    }
     int idx = hashFn(key);
     for (int step = 0; step < M; step++) {
         int pos = (idx + step) % M;
@@ -47,6 +61,10 @@ void display() {
 int main() {
     for (int i = 0; i < M; i++) table[i] = {-1, ""};
     for (int i = 0; i < N; i++) insertKey(keys[i], names[i]);
+    insertKey(46, "Dasheri");            // duplicate test
     display();
+    int p = searchKey(89);
+    cout << "\nSearch 89: slot " << p << " (" << table[p].name << ")\n";
+    cout << "Search 99: " << (searchKey(99) == -1 ? "not found" : "found") << endl;
     return 0;
 }
